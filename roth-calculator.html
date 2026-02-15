@@ -414,9 +414,33 @@
             document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
-        function submitEmail(event) {
-            event.preventDefault();
-            const email = document.getElementById('emailInput').value;
+        async function submitEmail(event) {
+    event.preventDefault();
+    const email = document.getElementById('emailInput').value;
+    const button = event.target.querySelector('button');
+    const originalText = button.textContent;
+    
+    button.textContent = 'Sending...';
+    button.disabled = true;
+    
+    try {
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbz9TCrlL981DK2fdp5OCVG8gxnvyCv40CD-Myg6UgCasuccUp0VtDQUycH51GQO7yHOpA/exec';
+        
+        await fetch(scriptURL, {
+            method: 'POST',
+            body: new URLSearchParams({ email: email })
+        });
+        
+        alert('✅ Success! Check your email for the complete Roth Conversion Strategy Guide.\n\nEmail: ' + email);
+        event.target.reset();
+        
+    } catch (error) {
+        alert('There was an error. Please try again or contact me directly.');
+    } finally {
+        button.textContent = originalText;
+        button.disabled = false;
+    }
+}
             
             // Here you would send the email to your CRM/email service
             // For now, we'll just show a success message
