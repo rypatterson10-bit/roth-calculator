@@ -209,6 +209,11 @@
             transform: translateY(-2px);
         }
 
+        .email-form button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         .benefits {
             margin-top: 40px;
             display: grid;
@@ -391,7 +396,7 @@
             const futureValue = balance * Math.pow(1 + growth, years);
 
             // Calculate tax if converted now over multiple years
-            const conversionYears = 5; // Spread conversion over 5 years
+            const conversionYears = 5;
             const annualConversion = balance / conversionYears;
             const taxOnConversion = balance * currentTax;
 
@@ -415,42 +420,31 @@
         }
 
         async function submitEmail(event) {
-    event.preventDefault();
-    const email = document.getElementById('emailInput').value;
-    const button = event.target.querySelector('button');
-    const originalText = button.textContent;
-    
-    button.textContent = 'Sending...';
-    button.disabled = true;
-    
-    try {
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbz9TCrlL981DK2fdp5OCVG8gxnvyCv40CD-Myg6UgCasuccUp0VtDQUycH51GQO7yHOpA/exec';
-        
-        await fetch(scriptURL, {
-            method: 'POST',
-            body: new URLSearchParams({ email: email })
-        });
-        
-        alert('✅ Success! Check your email for the complete Roth Conversion Strategy Guide.\n\nEmail: ' + email);
-        event.target.reset();
-        
-    } catch (error) {
-        alert('There was an error. Please try again or contact me directly.');
-    } finally {
-        button.textContent = originalText;
-        button.disabled = false;
-    }
-}
+            event.preventDefault();
+            const email = document.getElementById('emailInput').value;
+            const button = event.target.querySelector('button');
+            const originalText = button.textContent;
             
-            // Here you would send the email to your CRM/email service
-            // For now, we'll just show a success message
-            alert('Success! Check your email for the complete Roth Conversion Strategy Guide.\n\nEmail: ' + email);
+            button.textContent = 'Sending...';
+            button.disabled = true;
             
-            // In production, you'd integrate with:
-            // - Mailchimp
-            // - ConvertKit
-            // - Your CRM
-            // Example: fetch('/api/subscribe', { method: 'POST', body: JSON.stringify({ email }) })
+            try {
+                const scriptURL = 'https://script.google.com/macros/s/AKfycbz9TCrlL981DK2fdp5OCVG8gxnvyCv40CD-Myg6UgCasuccUp0VtDQUycH51GQO7yHOpA/exec';
+                
+                await fetch(scriptURL, {
+                    method: 'POST',
+                    body: new URLSearchParams({ email: email })
+                });
+                
+                alert('✅ Success! Check your email for the complete Roth Conversion Strategy Guide.\n\nEmail: ' + email);
+                event.target.reset();
+                
+            } catch (error) {
+                alert('There was an error. Please try again or contact me directly.');
+            } finally {
+                button.textContent = originalText;
+                button.disabled = false;
+            }
         }
     </script>
 </body>
