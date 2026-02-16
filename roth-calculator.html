@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roth Conversion Tax Savings Calculator</title>
+    <meta name="description" content="Free Roth Conversion Calculator - Discover how much you could save in taxes with strategic Roth conversions. Based on 2025 tax code.">
+    <meta property="og:title" content="Roth Conversion Tax Savings Calculator">
+    <meta property="og:description" content="Calculate your potential tax savings with strategic Roth conversions. Free analysis based on 2025 tax code.">
+    <meta property="og:type" content="website">
+    <title>Roth Conversion Tax Savings Calculator - Free Analysis</title>
     <style>
         * {
             margin: 0;
@@ -19,7 +23,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -37,10 +41,22 @@
         .header h1 {
             font-size: 32px;
             margin-bottom: 10px;
+            font-weight: 700;
         }
 
         .header p {
             font-size: 18px;
+            opacity: 0.95;
+            line-height: 1.4;
+        }
+
+        .trust-badge {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 13px;
             opacity: 0.9;
         }
 
@@ -49,7 +65,7 @@
         }
 
         .input-group {
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .input-group label {
@@ -60,55 +76,32 @@
             font-size: 16px;
         }
 
-        .input-group input {
+        .input-group input,
+        .input-group select {
             width: 100%;
             padding: 12px 16px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             font-size: 16px;
-            transition: border-color 0.3s;
+            transition: all 0.3s;
         }
 
-        .input-group input:focus {
+        .input-group input:focus,
+        .input-group select:focus {
             outline: none;
             border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        .slider-container {
-            margin-top: 10px;
-        }
-
-        .slider {
-            width: 100%;
-            height: 8px;
-            border-radius: 5px;
-            background: #e0e0e0;
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #667eea;
-            cursor: pointer;
-        }
-
-        .slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #667eea;
-            cursor: pointer;
-            border: none;
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
 
         .calculate-btn {
             width: 100%;
-            padding: 16px;
+            padding: 18px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
@@ -116,51 +109,166 @@
             font-size: 18px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.3s;
+            margin-top: 10px;
+            position: relative;
         }
 
         .calculate-btn:hover {
             transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .calculate-btn.calculating {
+            background: #999;
+            cursor: not-allowed;
         }
 
         .results {
             display: none;
             margin-top: 40px;
-            padding: 30px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            border-left: 4px solid #667eea;
+            animation: fadeIn 0.5s ease-in;
         }
 
         .results.show {
             display: block;
         }
 
-        .result-item {
-            margin-bottom: 20px;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .result-item h3 {
+        .result-highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 35px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-highlight::before {
+            content: '✓';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            opacity: 0.3;
+        }
+
+        .result-highlight h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            opacity: 0.95;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .result-highlight .big-number {
+            font-size: 56px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .result-highlight .subtext {
+            opacity: 0.9;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        .strategy-box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .strategy-box h3 {
             color: #333;
-            font-size: 16px;
-            margin-bottom: 5px;
+            margin-bottom: 15px;
+            font-size: 20px;
+            font-weight: 700;
         }
 
-        .result-item .value {
-            font-size: 32px;
+        .strategy-detail {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            background: white;
+            padding: 18px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .detail-item label {
+            display: block;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .detail-item .value {
+            font-size: 26px;
             font-weight: 700;
             color: #667eea;
         }
 
-        .result-item .subtext {
-            color: #666;
-            margin-top: 5px;
+        .comparison {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .comparison h4 {
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .disclaimer {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .disclaimer h4 {
+            color: #856404;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .disclaimer ul {
+            margin-left: 20px;
+            color: #856404;
+        }
+
+        .disclaimer li {
+            margin-bottom: 5px;
         }
 
         .email-capture {
             display: none;
-            margin-top: 40px;
-            padding: 30px;
+            margin-top: 30px;
+            padding: 35px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 12px;
             color: white;
@@ -168,16 +276,19 @@
 
         .email-capture.show {
             display: block;
+            animation: fadeIn 0.5s ease-in 0.3s both;
         }
 
         .email-capture h2 {
             margin-bottom: 15px;
-            font-size: 24px;
+            font-size: 26px;
+            font-weight: 700;
         }
 
         .email-capture p {
             margin-bottom: 20px;
-            opacity: 0.9;
+            opacity: 0.95;
+            line-height: 1.5;
         }
 
         .email-form {
@@ -187,14 +298,14 @@
 
         .email-form input {
             flex: 1;
-            padding: 12px 16px;
+            padding: 14px 18px;
             border: none;
             border-radius: 8px;
             font-size: 16px;
         }
 
         .email-form button {
-            padding: 12px 30px;
+            padding: 14px 35px;
             background: white;
             color: #667eea;
             border: none;
@@ -202,55 +313,68 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.3s;
         }
 
         .email-form button:hover {
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
         .email-form button:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
         }
 
-        .benefits {
-            margin-top: 40px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .benefit-card {
+        .warning-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
             padding: 20px;
-            background: #f8f9fa;
-            border-radius: 12px;
+            margin-bottom: 25px;
             text-align: center;
         }
 
-        .benefit-card .icon {
-            font-size: 40px;
+        .warning-box h3 {
+            color: #856404;
             margin-bottom: 10px;
+            font-weight: 700;
         }
 
-        .benefit-card h3 {
-            color: #333;
-            margin-bottom: 8px;
-            font-size: 18px;
+        .warning-box p {
+            color: #856404;
+            line-height: 1.5;
         }
 
-        .benefit-card p {
-            color: #666;
-            font-size: 14px;
-        }
-
-        @media (max-width: 600px) {
-            .header h1 {
-                font-size: 24px;
+        @media (max-width: 768px) {
+            .input-row,
+            .strategy-detail {
+                grid-template-columns: 1fr;
             }
-            
+
+            .header h1 {
+                font-size: 26px;
+            }
+
+            .header p {
+                font-size: 16px;
+            }
+
+            .result-highlight .big-number {
+                font-size: 42px;
+            }
+
             .email-form {
                 flex-direction: column;
+            }
+
+            .content {
+                padding: 30px 25px;
+            }
+            
+            .header {
+                padding: 30px 20px;
             }
         }
     </style>
@@ -259,164 +383,311 @@
     <div class="container">
         <div class="header">
             <h1>💰 Roth Conversion Tax Savings Calculator</h1>
-            <p>Discover how much you could save with strategic Roth conversions</p>
+            <p>Find out how much you could save with a strategic tax plan — most retirees leave six figures on the table</p>
+            <div class="trust-badge">
+                ✓ Based on 2025 tax code • Free analysis • No obligation
+            </div>
         </div>
 
         <div class="content">
-            <div class="input-group">
-                <label for="currentAge">Your Current Age</label>
-                <input type="number" id="currentAge" value="45" min="18" max="80">
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="currentAge">Current Age</label>
+                    <input type="number" id="currentAge" value="60" min="30" max="80">
+                </div>
+
+                <div class="input-group">
+                    <label for="retirementAge">Planned Retirement Age</label>
+                    <input type="number" id="retirementAge" value="65" min="50" max="75">
+                </div>
             </div>
 
             <div class="input-group">
                 <label for="iraBalance">Traditional IRA/401(k) Balance</label>
-                <input type="text" id="iraBalance" value="$500,000">
+                <input type="text" id="iraBalance" value="$1,000,000" placeholder="e.g., $500,000">
             </div>
 
             <div class="input-group">
-                <label for="currentTaxRate">Current Tax Bracket (%)</label>
-                <input type="number" id="currentTaxRate" value="24" min="10" max="37">
-                <div class="slider-container">
-                    <input type="range" class="slider" id="currentTaxSlider" min="10" max="37" value="24">
-                </div>
+                <label for="ssAge">When do you plan to start Social Security?</label>
+                <select id="ssAge">
+                    <option value="62">Age 62 (Early - Reduced Benefits)</option>
+                    <option value="63">Age 63</option>
+                    <option value="64">Age 64</option>
+                    <option value="65">Age 65</option>
+                    <option value="66">Age 66</option>
+                    <option value="67">Age 67 (Full Retirement Age)</option>
+                    <option value="68">Age 68</option>
+                    <option value="69">Age 69</option>
+                    <option value="70" selected>Age 70 (Maximum - Delayed Credits)</option>
+                </select>
             </div>
 
             <div class="input-group">
-                <label for="retirementTaxRate">Expected Retirement Tax Bracket (%)</label>
-                <input type="number" id="retirementTaxRate" value="32" min="10" max="37">
-                <div class="slider-container">
-                    <input type="range" class="slider" id="retirementTaxSlider" min="10" max="37" value="32">
-                </div>
+                <label for="filingStatus">Tax Filing Status</label>
+                <select id="filingStatus">
+                    <option value="married" selected>Married Filing Jointly</option>
+                    <option value="single">Single</option>
+                </select>
             </div>
 
-            <div class="input-group">
-                <label for="annualGrowth">Expected Annual Growth Rate (%)</label>
-                <input type="number" id="annualGrowth" value="7" min="0" max="15" step="0.5">
-                <div class="slider-container">
-                    <input type="range" class="slider" id="growthSlider" min="0" max="15" step="0.5" value="7">
-                </div>
-            </div>
-
-            <button class="calculate-btn" onclick="calculateSavings()">Calculate My Tax Savings</button>
+            <button class="calculate-btn" onclick="calculateStrategy()" id="calcBtn">
+                Show Me My Tax Savings →
+            </button>
 
             <div class="results" id="results">
-                <div class="result-item">
-                    <h3>Total Tax Savings Over 20 Years</h3>
-                    <div class="value" id="totalSavings">$0</div>
-                    <div class="subtext">By converting strategically vs. waiting until retirement</div>
+                <div class="result-highlight">
+                    <h2>Your Estimated Tax Savings</h2>
+                    <div class="big-number" id="totalSavings">$0</div>
+                    <div class="subtext">By implementing strategic Roth conversions during your retirement window</div>
                 </div>
 
-                <div class="result-item">
-                    <h3>Future Account Value (Tax-Free)</h3>
-                    <div class="value" id="futureValue">$0</div>
-                    <div class="subtext">What your Roth IRA could grow to</div>
+                <div class="strategy-box">
+                    <h3>🎯 Your Optimal Conversion Strategy</h3>
+                    <div class="strategy-detail">
+                        <div class="detail-item">
+                            <label>Conversion Window</label>
+                            <div class="value" id="conversionWindow">-</div>
+                        </div>
+                        <div class="detail-item">
+                            <label>Annual Conversion Amount</label>
+                            <div class="value" id="annualConversion">$0</div>
+                        </div>
+                        <div class="detail-item">
+                            <label>Total Amount Converted</label>
+                            <div class="value" id="totalConverted">$0</div>
+                        </div>
+                        <div class="detail-item">
+                            <label>Tax Rate on Conversions</label>
+                            <div class="value">12%</div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="result-item">
-                    <h3>Annual Conversion Recommendation</h3>
-                    <div class="value" id="annualConversion">$0</div>
-                    <div class="subtext">Optimal amount to convert each year</div>
+                <div class="comparison">
+                    <h4>📊 Lifetime Tax Bill Comparison</h4>
+                    <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 20px; margin-bottom: 15px;">
+                        <div style="font-size: 14px; color: #856404; margin-bottom: 5px; font-weight: 600;">WITHOUT strategic conversions:</div>
+                        <div id="rmdTax" style="font-size: 36px; font-weight: 700; color: #dc3545;">$0</div>
+                        <div style="font-size: 13px; color: #856404; margin-top: 5px;">All retirement withdrawals taxed at higher rates (22-24%)</div>
+                    </div>
+                    <div style="background: #d1e7dd; border: 2px solid #28a745; border-radius: 8px; padding: 20px;">
+                        <div style="font-size: 14px; color: #0a3622; margin-bottom: 5px; font-weight: 600;">WITH strategic conversions:</div>
+                        <div id="conversionTax" style="font-size: 36px; font-weight: 700; color: #28a745;">$0</div>
+                        <div style="font-size: 13px; color: #0a3622; margin-top: 5px;">Conversions at 12% now + minimal taxes later = huge savings</div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="email-capture" id="emailCapture">
-                <h2>📊 Want the Full Tax Optimization Guide?</h2>
-                <p>Get my complete "High Earner's Roth Conversion Strategy Guide" including:</p>
-                <ul style="margin-bottom: 20px; padding-left: 20px;">
-                    <li>7 advanced Roth conversion strategies</li>
-                    <li>Year-by-year conversion planning worksheet</li>
-                    <li>Tax bracket optimization calculator</li>
-                    <li>Common mistakes to avoid</li>
-                </ul>
-                <form class="email-form" onsubmit="submitEmail(event)">
-                    <input type="email" id="emailInput" placeholder="Enter your email" required>
-                    <button type="submit">Get Free Guide</button>
-                </form>
-            </div>
+                <div class="strategy-box" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none;">
+                    <h3 style="color: white;">💰 Tax Savings Growth Potential</h3>
+                    <p style="margin-bottom: 15px; color: white; opacity: 0.95; font-weight: 500;">What your tax savings could grow to if invested at 7% annually:</p>
+                    <div style="background: rgba(255,255,255,0.2); border-radius: 8px; padding: 25px; text-align: center;">
+                        <div style="color: white; opacity: 0.95; font-size: 16px; margin-bottom: 10px;">
+                            Tax savings of <span id="savingsAmount2" style="font-weight: 700;">$0</span> growing to age 85:
+                        </div>
+                        <div class="value" id="savingsGrowth" style="color: white; font-size: 52px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">$0</div>
+                        <div style="color: white; opacity: 0.95; margin-top: 15px; font-size: 14px; line-height: 1.4;">
+                            This is what keeping your money invested instead of paying it to the IRS could be worth
+                        </div>
+                    </div>
+                </div>
 
-            <div class="benefits">
-                <div class="benefit-card">
-                    <div class="icon">📈</div>
-                    <h3>Tax-Free Growth</h3>
-                    <p>All future growth and withdrawals are 100% tax-free</p>
+                <div class="strategy-box">
+                    <h3>🚀 Tax-Free Roth Growth</h3>
+                    <p style="margin-bottom: 15px; color: #666; font-weight: 500;">Plus, your converted Roth balance grows completely tax-free:</p>
+                    <div class="detail-item" style="background: #f8f9fa; border: 2px solid #667eea; padding: 20px;">
+                        <label style="color: #667eea; font-weight: 600;">Your <span id="rothConverted">$0</span> in conversions growing tax-free at 7% to age 85:</label>
+                        <div class="value" id="rothGrowth" style="color: #667eea; font-size: 40px; margin-top: 10px;">$0</div>
+                        <div style="margin-top: 10px; color: #666; font-size: 14px; font-weight: 500;">100% tax-free withdrawals. No RMDs. Complete control.</div>
+                    </div>
                 </div>
-                <div class="benefit-card">
-                    <div class="icon">🎯</div>
-                    <h3>Lower RMDs</h3>
-                    <p>Reduce or eliminate required minimum distributions</p>
+
+                <div class="disclaimer">
+                    <h4>⚠️ This is a simplified estimate</h4>
+                    <p style="margin-bottom: 10px;">Your actual tax savings could be significantly higher or lower based on:</p>
+                    <ul>
+                        <li>Your non-retirement asset levels and income sources</li>
+                        <li>Social Security taxation and timing strategies</li>
+                        <li>State income taxes in your jurisdiction</li>
+                        <li>Medicare IRMAA surcharges (income-based premiums)</li>
+                        <li>Precise Required Minimum Distribution calculations</li>
+                        <li>Future tax law changes and bracket adjustments</li>
+                        <li>Estate planning goals and legacy considerations</li>
+                    </ul>
                 </div>
-                <div class="benefit-card">
-                    <div class="icon">💡</div>
-                    <h3>Estate Planning</h3>
-                    <p>Leave tax-free income to your heirs</p>
+
+                <div class="email-capture">
+                    <h2>📊 Want a Personalized Analysis?</h2>
+                    <p>Get my complete "Strategic Roth Conversion Planning Guide" and find out exactly how this strategy applies to YOUR situation:</p>
+                    <ul style="margin-bottom: 25px; padding-left: 20px; line-height: 1.6;">
+                        <li>Year-by-year conversion planning worksheet</li>
+                        <li>How to coordinate with Social Security timing</li>
+                        <li>Tax bracket optimization strategies</li>
+                        <li>RMD reduction techniques</li>
+                        <li>Common mistakes that cost retirees thousands</li>
+                    </ul>
+                    <form class="email-form" onsubmit="submitEmail(event)">
+                        <input type="email" id="emailInput" placeholder="Enter your email address" required>
+                        <button type="submit">Get Free Guide →</button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Sync sliders with inputs
-        document.getElementById('currentTaxSlider').addEventListener('input', function() {
-            document.getElementById('currentTaxRate').value = this.value;
-        });
-        document.getElementById('currentTaxRate').addEventListener('input', function() {
-            document.getElementById('currentTaxSlider').value = this.value;
-        });
-
-        document.getElementById('retirementTaxSlider').addEventListener('input', function() {
-            document.getElementById('retirementTaxRate').value = this.value;
-        });
-        document.getElementById('retirementTaxRate').addEventListener('input', function() {
-            document.getElementById('retirementTaxSlider').value = this.value;
+        // Format currency inputs
+        const currencyInputs = ['iraBalance'];
+        currencyInputs.forEach(id => {
+            document.getElementById(id).addEventListener('blur', function() {
+                let value = this.value.replace(/[^0-9.]/g, '');
+                if (value) {
+                    this.value = '$' + parseFloat(value).toLocaleString();
+                }
+            });
         });
 
-        document.getElementById('growthSlider').addEventListener('input', function() {
-            document.getElementById('annualGrowth').value = this.value;
-        });
-        document.getElementById('annualGrowth').addEventListener('input', function() {
-            document.getElementById('growthSlider').value = this.value;
-        });
-
-        // Format currency input
-        document.getElementById('iraBalance').addEventListener('blur', function() {
-            let value = this.value.replace(/[^0-9.]/g, '');
-            this.value = '$' + parseFloat(value).toLocaleString();
-        });
-
-        function calculateSavings() {
+        function calculateStrategy() {
+            const btn = document.getElementById('calcBtn');
+            
             // Get inputs
-            const age = parseInt(document.getElementById('currentAge').value);
-            const balance = parseFloat(document.getElementById('iraBalance').value.replace(/[^0-9.]/g, ''));
-            const currentTax = parseFloat(document.getElementById('currentTaxRate').value) / 100;
-            const retirementTax = parseFloat(document.getElementById('retirementTaxRate').value) / 100;
-            const growth = parseFloat(document.getElementById('annualGrowth').value) / 100;
+            const currentAge = parseInt(document.getElementById('currentAge').value);
+            const retirementAge = parseInt(document.getElementById('retirementAge').value);
+            const iraBalance = parseFloat(document.getElementById('iraBalance').value.replace(/[^0-9.]/g, ''));
+            const ssAge = parseInt(document.getElementById('ssAge').value);
+            const filingStatus = document.getElementById('filingStatus').value;
 
-            // Calculate future value
-            const years = 20;
-            const futureValue = balance * Math.pow(1 + growth, years);
+            // Validation
+            if (!iraBalance || iraBalance <= 0) {
+                alert('Please enter a valid IRA/401(k) balance');
+                return;
+            }
 
-            // Calculate tax if converted now over multiple years
-            const conversionYears = 5;
-            const annualConversion = balance / conversionYears;
-            const taxOnConversion = balance * currentTax;
+            if (currentAge >= retirementAge) {
+                alert('Retirement age must be greater than current age');
+                return;
+            }
 
-            // Calculate tax if withdrawn in retirement
-            const taxInRetirement = futureValue * retirementTax;
+            if (ssAge < retirementAge) {
+                alert('Social Security start age should typically be at or after retirement age for optimal conversion strategy');
+                return;
+            }
 
-            // Total savings
-            const totalSavings = taxInRetirement - taxOnConversion;
+            // Show calculating state
+            btn.classList.add('calculating');
+            btn.textContent = 'Calculating...';
+            btn.disabled = true;
+            
+            // Disable all inputs during calculation
+            document.querySelectorAll('input, select').forEach(el => el.disabled = true);
 
-            // Display results
-            document.getElementById('totalSavings').textContent = '$' + Math.round(totalSavings).toLocaleString();
-            document.getElementById('futureValue').textContent = '$' + Math.round(futureValue).toLocaleString();
-            document.getElementById('annualConversion').textContent = '$' + Math.round(annualConversion).toLocaleString();
+            // Calculate with slight delay for UX
+            setTimeout(() => {
+                // Tax bracket tops for 2025 (updated for inflation)
+                const bracket12Top = filingStatus === 'married' ? 96950 : 48475;
+                
+                // Calculate conversion window
+                const conversionYears = ssAge - retirementAge;
+                
+                // Handle edge case: no conversion window
+                if (conversionYears <= 0) {
+                    alert('With your current timeline, there\'s no conversion window between retirement and Social Security. Consider delaying Social Security to create a conversion opportunity.');
+                    btn.classList.remove('calculating');
+                    btn.textContent = 'Show Me My Tax Savings →';
+                    btn.disabled = false;
+                    document.querySelectorAll('input, select').forEach(el => el.disabled = false);
+                    return;
+                }
+                
+                // Annual conversion amount (fill 12% bracket)
+                const standardDeduction = filingStatus === 'married' ? 30000 : 15000;
+                const conversionSpace = bracket12Top - standardDeduction;
+                
+                // Total that can be converted
+                const totalConverted = Math.min(iraBalance, conversionSpace * conversionYears);
+                const annualConversion = totalConverted / conversionYears;
+                
+                // Tax on conversions at 12%
+                const conversionTax = totalConverted * 0.12;
+                
+                // SCENARIO 1: DO NOTHING (No conversions)
+                const yearsToRMD = 73 - retirementAge;
+                const growthRate = 0.06;
+                const iraBalanceAtRMD_NoConversions = iraBalance * Math.pow(1 + growthRate, yearsToRMD);
+                
+                // Lifetime RMD taxes at 22-24%
+                const avgRMDTaxRate = 0.23;
+                const totalRMDTax_NoConversions = iraBalanceAtRMD_NoConversions * avgRMDTaxRate;
+                
+                // SCENARIO 2: STRATEGIC CONVERSIONS
+                const remainingBalance = iraBalance - totalConverted;
+                const remainingBalanceAtRMD = remainingBalance * Math.pow(1 + growthRate, yearsToRMD);
+                const totalRMDTax_WithConversions = remainingBalanceAtRMD * avgRMDTaxRate;
+                
+                // Total lifetime tax bill WITH strategy
+                const totalTaxWithStrategy = conversionTax + totalRMDTax_WithConversions;
+                
+                // Tax savings
+                const totalSavings = totalRMDTax_NoConversions - totalTaxWithStrategy;
+                
+                // Handle negative savings scenario
+                if (totalSavings <= 0) {
+                    alert('Based on your inputs, a Roth conversion strategy may not provide significant savings. This could be due to your specific situation. I recommend a personalized analysis to explore all your options.');
+                    btn.classList.remove('calculating');
+                    btn.textContent = 'Show Me My Tax Savings →';
+                    btn.disabled = false;
+                    document.querySelectorAll('input, select').forEach(el => el.disabled = false);
+                    return;
+                }
+                
+                // Tax savings growth potential
+                const savingsGrowthYears = 85 - retirementAge;
+                const savingsGrowthRate = 0.07;
+                const savingsGrowthValue = totalSavings * Math.pow(1 + savingsGrowthRate, savingsGrowthYears);
+                
+                // Roth growth
+                const rothGrowthYears = 85 - retirementAge;
+                const rothGrowthRate = 0.07;
+                const rothBalanceAtAge85 = totalConverted * Math.pow(1 + rothGrowthRate, rothGrowthYears);
+                
+                // Display results
+                document.getElementById('totalSavings').textContent = '$' + Math.round(totalSavings).toLocaleString();
+                document.getElementById('conversionWindow').textContent = `Ages ${retirementAge}-${ssAge}`;
+                document.getElementById('annualConversion').textContent = '$' + Math.round(annualConversion).toLocaleString();
+                document.getElementById('totalConverted').textContent = '$' + Math.round(totalConverted).toLocaleString();
+                
+                // Lifetime tax bills
+                document.getElementById('rmdTax').textContent = '$' + Math.round(totalRMDTax_NoConversions).toLocaleString();
+                document.getElementById('conversionTax').textContent = '$' + Math.round(totalTaxWithStrategy).toLocaleString();
+                
+                // Tax savings and growth
+                document.getElementById('savingsAmount2').textContent = '$' + Math.round(totalSavings).toLocaleString();
+                document.getElementById('savingsGrowth').textContent = '$' + Math.round(savingsGrowthValue).toLocaleString();
+                
+                // Roth growth
+                document.getElementById('rothGrowth').textContent = '$' + Math.round(rothBalanceAtAge85).toLocaleString();
+                document.getElementById('rothConverted').textContent = '$' + Math.round(totalConverted).toLocaleString();
 
-            // Show results and email capture
-            document.getElementById('results').classList.add('show');
-            document.getElementById('emailCapture').classList.add('show');
-
-            // Scroll to results
-            document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                // Show results
+                document.getElementById('results').classList.add('show');
+                
+                // Show email capture after results
+                setTimeout(() => {
+                    document.querySelector('.email-capture').classList.add('show');
+                }, 500);
+                
+                // Reset button
+                btn.classList.remove('calculating');
+                btn.textContent = 'Recalculate';
+                btn.disabled = false;
+                
+                // Re-enable all inputs
+                document.querySelectorAll('input, select').forEach(el => el.disabled = false);
+                
+                // Scroll to results
+                setTimeout(() => {
+                    document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }, 600);
         }
 
         async function submitEmail(event) {
@@ -436,7 +707,7 @@
                     body: new URLSearchParams({ email: email })
                 });
                 
-                alert('✅ Success! Check your email for the complete Roth Conversion Strategy Guide.\n\nEmail: ' + email);
+                alert('✅ Success! Your guide is on its way.\n\nCheck your email for the Strategic Roth Conversion Planning Guide. I\'ll also reach out personally within 24 hours to discuss your specific situation.\n\nTalk soon!\n\nEmail sent to: ' + email);
                 event.target.reset();
                 
             } catch (error) {
