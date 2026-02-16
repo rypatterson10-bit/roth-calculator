@@ -582,8 +582,17 @@
 
             // Calculate with slight delay for UX
             setTimeout(() => {
-                // Tax bracket tops for 2025 (updated for inflation)
-                const bracket12Top = filingStatus === 'married' ? 96950 : 48475;
+                // PRE-RETIREMENT IRA GROWTH (7% annually while working)
+                const yearsUntilRetirement = retirementAge - currentAge;
+                const preRetirementGrowthRate = 0.07;
+                const iraBalanceAtRetirement = iraBalance * Math.pow(1 + preRetirementGrowthRate, yearsUntilRetirement);
+                
+                // Tax bracket inflation rate (3% annually)
+                const bracketInflationRate = 0.03;
+                
+                // 2025 base brackets and standard deductions
+                const base12BracketTop = filingStatus === 'married' ? 96950 : 48475;
+                const baseStandardDeduction = filingStatus === 'married' ? 30000 : 15000;
                 
                 // Calculate conversion window
                 const conversionYears = ssAge - retirementAge;
@@ -598,29 +607,73 @@
                     return;
                 }
                 
-                // Annual conversion amount (fill 12% bracket)
-                const standardDeduction = filingStatus === 'married' ? 30000 : 15000;
-                const conversionSpace = bracket12Top - standardDeduction;
+                // Calculate total conversions with inflating brackets
+                let totalConverted = 0;
+                let runningBalance = iraBalanceAtRetirement;
+                const postRetirementGrowthRate = 0.06;
+                const rothGrowthRate = 0.07;
+                let rothBalanceAtAge85 = 0; // Will accumulate each year's conversion growth
                 
-                // Total that can be converted
-                const totalConverted = Math.min(iraBalance, conversionSpace * conversionYears);
+                for (let year = 0; year < conversionYears; year++) {
+                    // Calculate inflated bracket for this year
+                    const yearsFromNow = yearsUntilRetirement + year;
+                    const inflatedBracketTop = base12BracketTop * Math.pow(1 + bracketInflationRate, yearsFromNow);
+                    const inflatedStandardDeduction = baseStandardDeduction * Math.pow(1 + bracketInflationRate, yearsFromNow);
+                    
+                    // Conversion space for this year
+                    const conversionSpace = inflatedBracketTop - inflatedStandardDeduction;
+                    
+                    // Convert up to the available space or remaining balance
+                    const thisYearConversion = Math.min(conversionSpace, runningBalance);
+                    totalConverted += thisYearConversion;
+                    
+                    // This year's conversion grows tax-free from now until age 85
+                    const ageAtConversion = retirementAge + year;
+                    const yearsToGrow = 85 - ageAtConversion;
+                    const thisConversionGrowth = thisYearConversion * Math.pow(1 + rothGrowthRate, yearsToGrow);
+                    rothBalanceAtAge85 += thisConversionGrowth;
+                    
+                    // Reduce balance by conversion
+                    runningBalance -= thisYearConversion;
+                    
+                    // Stop if we've converted everything
+                    if (runningBalance <= 0) {
+                        runningBalance = 0;
+                        break;
+                    }
+                    
+                    // Grow remaining balance at 6% for next year (only if not the last year)
+                    if (year < conversionYears - 1) {
+                        runningBalance *= (1 + postRetirementGrowthRate);
+                    }
+                }
+                
+                // Average annual conversion (for display purposes)
                 const annualConversion = totalConverted / conversionYears;
                 
                 // Tax on conversions at 12%
                 const conversionTax = totalConverted * 0.12;
                 
                 // SCENARIO 1: DO NOTHING (No conversions)
+                // Project entire IRA balance from retirement to RMD age
                 const yearsToRMD = 73 - retirementAge;
-                const growthRate = 0.06;
-                const iraBalanceAtRMD_NoConversions = iraBalance * Math.pow(1 + growthRate, yearsToRMD);
+                const iraBalanceAtRMD_NoConversions = iraBalanceAtRetirement * Math.pow(1 + postRetirementGrowthRate, yearsToRMD);
                 
                 // Lifetime RMD taxes at 22-24%
                 const avgRMDTaxRate = 0.23;
                 const totalRMDTax_NoConversions = iraBalanceAtRMD_NoConversions * avgRMDTaxRate;
                 
                 // SCENARIO 2: STRATEGIC CONVERSIONS
-                const remainingBalance = iraBalance - totalConverted;
-                const remainingBalanceAtRMD = remainingBalance * Math.pow(1 + growthRate, yearsToRMD);
+                // Remaining balance after conversions (already grown during conversion window)
+                const remainingBalance = runningBalance;
+                
+                // Project remaining balance from end of conversion window to RMD age
+                const yearsFromConversionEndToRMD = 73 - ssAge;
+                const remainingBalanceAtRMD = yearsFromConversionEndToRMD > 0 
+                    ? remainingBalance * Math.pow(1 + postRetirementGrowthRate, yearsFromConversionEndToRMD)
+                    : remainingBalance;
+                
+                // Tax on remaining RMDs (much smaller now)
                 const totalRMDTax_WithConversions = remainingBalanceAtRMD * avgRMDTaxRate;
                 
                 // Total lifetime tax bill WITH strategy
@@ -639,15 +692,12 @@
                     return;
                 }
                 
-                // Tax savings growth potential
+                // Tax savings growth potential (savings invested at 7% to age 85)
                 const savingsGrowthYears = 85 - retirementAge;
                 const savingsGrowthRate = 0.07;
                 const savingsGrowthValue = totalSavings * Math.pow(1 + savingsGrowthRate, savingsGrowthYears);
                 
-                // Roth growth
-                const rothGrowthYears = 85 - retirementAge;
-                const rothGrowthRate = 0.07;
-                const rothBalanceAtAge85 = totalConverted * Math.pow(1 + rothGrowthRate, rothGrowthYears);
+                // Roth balance at age 85 is already calculated in the conversion loop above
                 
                 // Display results
                 document.getElementById('totalSavings').textContent = '$' + Math.round(totalSavings).toLocaleString();
@@ -696,6 +746,20 @@
             const button = event.target.querySelector('button');
             const originalText = button.textContent;
             
+            // Capture all the calculator inputs and results
+            const leadData = {
+                email: email,
+                currentAge: document.getElementById('currentAge').value,
+                retirementAge: document.getElementById('retirementAge').value,
+                iraBalance: document.getElementById('iraBalance').value,
+                ssAge: document.getElementById('ssAge').value,
+                filingStatus: document.getElementById('filingStatus').value,
+                calculatedSavings: document.getElementById('totalSavings').textContent,
+                totalConverted: document.getElementById('totalConverted').textContent,
+                conversionWindow: document.getElementById('conversionWindow').textContent,
+                timestamp: new Date().toISOString()
+            };
+            
             button.textContent = 'Sending...';
             button.disabled = true;
             
@@ -704,7 +768,7 @@
                 
                 await fetch(scriptURL, {
                     method: 'POST',
-                    body: new URLSearchParams({ email: email })
+                    body: new URLSearchParams(leadData)
                 });
                 
                 alert('✅ Success! Your guide is on its way.\n\nCheck your email for the Strategic Roth Conversion Planning Guide. I\'ll also reach out personally within 24 hours to discuss your specific situation.\n\nTalk soon!\n\nEmail sent to: ' + email);
